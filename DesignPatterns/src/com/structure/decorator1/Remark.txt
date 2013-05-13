@@ -1,0 +1,6 @@
+装饰者模式
+Client.java 客户端
+ConcreteComponent.java 需要被装饰的类对象
+Decorator.java 装饰者，包含IComponent的引用
+ConcreteDecorator.java 具体的装饰者，继承Decorator 并添加了具体的行为方法
+IComponent.java 定义对象接口，可以动态给对象添加动态职责

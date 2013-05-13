@@ -1,0 +1,24 @@
+迭代模式
+Controller.java 实现Iterator.java的接口 构造函数需要一个Vector<Item> v的Item 集合对象
+ITelevision.java 定义获取集合和迭代的接口方法，提供Vector<Item> getChannel()和  Iterator createIterator()两个方法
+Item.java 频道最小对象,需要迭代的对象
+Iterator.java Iterator接口，定义first(),next(),size(),isLast()方法
+TCLTV.java 实现ITelevision.java 接口，在构造函数的时候初始化集合对象,getChannel()方法返回这个集合对象，
+在createIterator()方法中返回一个new Coller的实例
+Client.java 1.创建了一个ITelevision的TCL电视对象
+            2.通过createIterator()方法，获取到Iterator的迭代器！
+            3.通过while(!iterator.isLast)循环迭代出item的对象
+            实质是通过Controller.java 这个类的next方法对TCLTV.java 提供的集合Vector<Item> 进行循环遍历
+
+参与者：
+       Iterator：迭代器定义访问和遍历元素的接口。
+       ConcreteIterator(Controller)：具体迭代器实现迭代器接口，对该聚合遍历时跟踪当前位置。
+       Aggregate（Televation）:聚合定义了创建相应迭代器对象的接口。
+       ConcreteAggregate(HaierTV):具体聚合实现创建相应迭代器的接口，该操作返回ConcreteIterator的一个适当的实例。
+协作关系：ConcreteIterator跟踪聚合中的当前对象，并能够计算出待遍历的后继对象。
+ 
+使用迭代器的好处：
+1.他支持以不同的方式遍历一个聚合， 复杂的聚合可用多种方式进行遍历。
+2.迭代器简化了聚合的接口 有了迭代器的遍历接口，聚合本身就不需要类似的遍历接口了，这样就简化了聚合的接口。
+3.在同一个聚合上可以有多个遍历 每个迭代器保持它自己的遍历状态。因此你可以同时进行多个遍历。
+在本例子中，Television定义了一个返回各个频道列表的接口，这实际上是一个工厂方法，只是生产出来的产品所属的类型支持Iterator的操作。

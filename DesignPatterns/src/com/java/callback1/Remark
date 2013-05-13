@@ -1,0 +1,138 @@
+//WaitingDlg 类
+public class WaitingDlg {
+	private LayoutInflater inflater;
+	private RelativeLayout relative;
+
+	private ImageView iv_loading;
+
+	private AnimationDrawable ad;
+
+	private Dialog dialog;
+	static WaitingDlg s_dlg = null;
+	Context context;
+	OnProcessListener s_process;
+	int s_Ret;
+	
+	public interface OnProcessListener{
+		abstract public int doInBackground();
+		abstract public void OnComplete(int ret);
+	}
+
+	private WaitingDlg(Context context, OnProcessListener p) {
+		this.context = context;
+		s_process = p;
+	}
+
+	public static WaitingDlg getDlg(Context context, OnProcessListener p) {
+		if (s_dlg == null) {
+			s_dlg = new WaitingDlg(context, p);
+		} else {
+			s_dlg.context = context;
+			s_dlg.s_process = p;
+		}
+		return s_dlg;
+	}
+
+	boolean IsDialogVisible = false;
+
+	public void Show() {
+		try {
+			inflater = LayoutInflater.from(context);
+			createDialog();
+			dialog.show();
+			IsDialogVisible = true;
+			new Thread() {
+				public void run() {
+					// 后台处理逻辑
+					s_Ret = s_process.doInBackground();
+					Log.d("longli", "doInBackground over");
+					// 处理完成
+					((Activity) context).runOnUiThread(new Runnable() {
+						public void run() {
+							s_process.OnComplete(s_Ret);
+							// 隐藏等待框
+							Hide();
+						}
+					});
+				}
+			}.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Hide();
+		}
+		
+	}
+
+	void Hide() {
+		try {
+			IsDialogVisible = false;
+			if (dialog != null) {
+				dialog.dismiss();
+				dialog = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void createDialog() {
+		
+		relative = (RelativeLayout) inflater.inflate(R.layout.load, null);
+		iv_loading = (ImageView) relative.findViewById(R.id.iv_loading);
+		iv_loading.setBackgroundResource(R.anim.loads);
+		ad = (AnimationDrawable) iv_loading.getBackground();
+
+		OnPreDrawListener opdl = new OnPreDrawListener() {
+			@Override
+			public boolean onPreDraw() {
+				Log.e("TAG", "onPreDraw");
+				ad.start();
+				return true;
+			}
+		};
+		iv_loading.getViewTreeObserver().addOnPreDrawListener(opdl);
+
+		dialog = new Dialog(context, R.style.help_dialog);
+		
+		dialog.setContentView(relative);
+		dialog.setCancelable(false);
+	}
+}
+//
+public class MainActivity extends Activity {
+
+	private Button button1;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		Button button = (Button) findViewById(R.id.button);
+		button1 = (Button) findViewById(R.id.button1);
+
+		button1.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				WaitingDlg.getDlg(MainActivity.this, new OnProcessListener() {
+					
+					@Override
+					public int doInBackground() {
+						try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {
+				   			e.printStackTrace();
+						}
+						return 0;
+					}
+					
+					@Override
+					public void OnComplete(int ret) {
+						Toast.makeText(MainActivity.this, "complete", Toast.LENGTH_LONG).show();
+					}
+				}).Show();
+			}
+		});
+	}	
+

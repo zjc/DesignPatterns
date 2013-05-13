@@ -1,0 +1,2 @@
+命令模式,行动(Action)模式或交易(Transaction)模式
+本demo 模拟了控制AudioPlayer播放的命令模式

@@ -1,0 +1,9 @@
+代理模式(拦截器实现)
+IAopInterface.java 接口, 定义拦截时需要额外处理的方法！
+AopInterfaceImpl.java 实现额外处理的方法
+Client.java 客户端 设置需要代理的类，拦截的方法，设置拦截处理对象(AopInterfaceImpl)
+ProxyObject.java 动态代理,实现InvocationHandler接口，
+实现invoke方法，在invoke方法中进行对调用函数的拦截处理
+
+ISubInterface.java 测试接口，定义一些方法
+SubInterfaceImpl.java 测试类，实现测试接口
